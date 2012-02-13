@@ -1,0 +1,29 @@
+Laptop tracking system (cheap)
+
+Following on from a discussion on a work forum, I decided to have a stab at writing a super simple laptop tracking system. The main aim of the system will be to track stolen laptops and (hopefully) recover them somehow.
+
+After a little bit of consideration, I decided to have a look at doing this in a client/server way with a MongoDB back end. The following is a simple, but workable system that uses the python bindings to the DBUS messaging system on Linux (tested on Ubuntu 11.04), so I am doubtful that this could be used for anything other than that. That being said, however, the client bit simply needs to send through wifi access points and MAC addresses to get a triangulation on the position of the laptop, so I am pretty sure that this can be achieved with relative ease on other platforms.
+
+Triangulation is done via a Google API and the coordinates as well as the accuracy level is then inserted to the MongoDB back end for mapping or whatever else needs to be done with the data. Features that the client should also probably support include bricking the machine remotely or something to that effect, as well as possibly sending messages or SOS tweets or something to let people know that it is not in its rightful owners posession.
+
+Client:
+
+As I said, the code uses python-dbus and the standard json and urllib modules. You can install python-dbus with an apt-get install python-dbus.
+
+You will need to modify the post URL at the end to somewhere meaningful for yourself of course.
+
+Initially, I did the client using the PHP ext/dbus, but decided against that due to the fact that it is hard to install and nobody really uses it... (the PHP DBUS code is still bundled in the locatefull.php file. If you decide to go this route, you will need to use geolocate.php on your server to catch the requests)
+
+The server side is just as simple. You will need a Mongodb instance running on the server and then you need a simple script to catch the POSTs. NOTE: This script is just a concept, so if you are actually going to do something like this, clean it up!
+
+From the code, you will see that we create a 2d geospatial index on the Mongodb instance as well. Not sure if this is useful, but it will probably help in speeding up queries like "Gimme all the laptops that Company X owns in area Y" or something - if that is something that you would like to add to your query interface of course...
+
+Also, I am not 100% sure of the legality of storing SSID's with a location, so check that one first too!
+
+Dead simple, works well.
+
+I would say that the client bit should be on a cron job or something that pings the service every hour or something.
+
+Remember: Mongodb works best on 64bit OS. If you are using a 32bit arch, then you will only be able to store around 2GB data at a time. Depending on the need for historical records etc, keep that in mind...
+
+Most importantly, HAVE FUN!
